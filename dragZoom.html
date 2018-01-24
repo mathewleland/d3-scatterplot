@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+</style>
+<svg width="500" height="500"></svg>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+
+var svg = d3.select("svg"),
+    width = +svg.attr("width"),
+    height = +svg.attr("height");
+    
+var radius = 10;    
+var points = d3.range(25).map(function(i) {
+    return {
+        x: i * 30,
+        y: i * 30
+    }
+}); 
+let start_x, start_y;
+let current_scale = 1;
+
+const circles = svg.append('g')
+                     .attr('class', 'circles')
+                   .selectAll('circle')
+                     .data(points)
+                     .enter()
+                     .append('circle')
+                       .attr('cx', (d) => d.x)
+                       .attr('cy', (d) => d.y)
+                       .attr('r', 10)
+                       .attr('fill', () => `#${((1<<24)*Math.random()|0).toString(16)}`); //random number
+
+
+//DRAG
+var drag_handler = d3.drag()
+                        .on('start', drag_start)
+                        .on('drag', drag_drag);
+
+function drag_start() {
+    start_x = +d3.event.x;
+    start_y = +d3.event.y;
+}
+
+function drag_drag(d) {
+    if (this.getAttribute('transform') === null) {
+        current_scale - 1;
+    } else {
+        current_scale_string = this.getAttribute('transform').split(' ')[1];
+        current_scale = +current_scale_string.substring(6, current_scale_string.length-1);
+    }
+    d3.select(this)
+      .attr('cx', d.x = start_x + ((d3.event.x - start_x) / current_scale))
+      .attr('cy', d.y = start_y + ((d3.event.y - start_y) / current_scale));
+}
+
+// drag_handler(circles);
+circles.call(drag_handler);
+
+//ZOOM
+var zoom_handler = d3.zoom()
+                    .scaleExtent([1/2, 4])
+                    .on('zoom', zoom_actions);
+
+function zoom_actions() {
+    circles.attr('transform', d3.event.transform);
+}
+
+// zoom_handler(svg);
+svg.call(zoom_handler);
+
+
+
+
+//SUCCINCT WAY TO DRAG
+// function dragged(d) {
+//     d3.select(this)
+//         .attr('cx', d.x = d3.event.x)
+//         .attr('cy', d.y = d3.event.y);
+// }
+// circles.call(d3.drag().on('drag', dragged));
+
+
+
+
+
+// svg.append('circle')
+//      .attr('cx', point.x)
+//      .attr('cy', point.y)
+//      .attr('r', 10)
+//      .attr('fill', 'red')
+//      .attr('transform', 'translate(400,200) scale(2)');
+
+// svg.append('circle')
+// .attr('cx', point.x)
+// .attr('cy', point.y)
+// .attr('r', 10)
+// .attr('fill', 'yellow')
+// .attr('transform', 'translate(400,200) scale(1)');
+
+// svg.append('circle')
+//     .attr('cx', point.x)
+//     .attr('cy', point.y)
+//     .attr('r', 10)
+//     .attr('fill', 'green')
+//     .attr('transform', 'translate(400,100) scale(5)');
+
+// const zoomFunction = d3.zoom()
+//         .scaleExtent([1/2, 4])
+//         .on('zoom', zoom_actions);
+
+// function zoom_actions() {
+//     // circles.attr('transform', d3.event.transform);
+
+//     //to be able to make it more flexible and call against certain divs
+//     this.setAttribute('transform', d3.zoomTransform(this))
+// }
+
+// zoomFunction(circles);
+</script>
