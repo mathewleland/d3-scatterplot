@@ -34,29 +34,32 @@ const circles = svg.append('g')
 
 
 //DRAG
-var drag_handler = d3.drag()
-                        .on('start', drag_start)
-                        .on('drag', drag_drag);
+// var drag_handler = d3.drag()
+//                         .on('start', drag_start)
+//                         .on('drag', drag_drag);
 
-function drag_start() {
-    start_x = +d3.event.x;
-    start_y = +d3.event.y;
-}
+// function drag_start() {
+//     d3.select(this)
+//         .select('circle')
+//         .attr('r', 20);
+//     start_x = +d3.event.x;
+//     start_y = +d3.event.y;
+// }
 
-function drag_drag(d) {
-    if (this.getAttribute('transform') === null) {
-        current_scale - 1;
-    } else {
-        current_scale_string = this.getAttribute('transform').split(' ')[1];
-        current_scale = +current_scale_string.substring(6, current_scale_string.length-1);
-    }
-    d3.select(this)
-      .attr('cx', d.x = start_x + ((d3.event.x - start_x) / current_scale))
-      .attr('cy', d.y = start_y + ((d3.event.y - start_y) / current_scale));
-}
+// function drag_drag(d) {
+//     if (this.getAttribute('transform') === null) {
+//         current_scale - 1;
+//     } else {
+//         current_scale_string = this.getAttribute('transform').split(' ')[1];
+//         current_scale = +current_scale_string.substring(6, current_scale_string.length-1);
+//     }
+//     d3.select(this)
+//       .attr('cx', d.x = start_x + ((d3.event.x - start_x) / current_scale))
+//       .attr('cy', d.y = start_y + ((d3.event.y - start_y) / current_scale));
+// }
 
-// drag_handler(circles);
-circles.call(drag_handler);
+// // drag_handler(circles);
+// circles.call(drag_handler);
 
 //ZOOM
 var zoom_handler = d3.zoom()
@@ -74,12 +77,24 @@ svg.call(zoom_handler);
 
 
 //SUCCINCT WAY TO DRAG
-// function dragged(d) {
-//     d3.select(this)
-//         .attr('cx', d.x = d3.event.x)
-//         .attr('cy', d.y = d3.event.y);
-// }
+function dragged(d) {
+    d3.select(this)
+        .attr('cx', d.x = d3.event.x)
+        .attr('cy', d.y = d3.event.y)
+        .on('start', dragStarted);
+}
 // circles.call(d3.drag().on('drag', dragged));
+
+function dragStarted() {
+//   d3.event.stopPropogation();
+  d3.select(this)
+    a.style('fill', 'red');
+
+}
+
+circles.call(d3.drag()
+        .on('start', dragStarted)
+        .on('drag', dragged));
 
 
 
