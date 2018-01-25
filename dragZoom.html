@@ -30,36 +30,9 @@ const circles = svg.append('g')
                        .attr('cx', (d) => d.x)
                        .attr('cy', (d) => d.y)
                        .attr('r', 10)
-                       .attr('fill', () => `#${((1<<24)*Math.random()|0).toString(16)}`); //random number
+                       .attr('fill', () => `#${((1<<24)*Math.random()|0).toString(16)}`); //random color
 
 
-//DRAG
-// var drag_handler = d3.drag()
-//                         .on('start', drag_start)
-//                         .on('drag', drag_drag);
-
-// function drag_start() {
-//     d3.select(this)
-//         .select('circle')
-//         .attr('r', 20);
-//     start_x = +d3.event.x;
-//     start_y = +d3.event.y;
-// }
-
-// function drag_drag(d) {
-//     if (this.getAttribute('transform') === null) {
-//         current_scale - 1;
-//     } else {
-//         current_scale_string = this.getAttribute('transform').split(' ')[1];
-//         current_scale = +current_scale_string.substring(6, current_scale_string.length-1);
-//     }
-//     d3.select(this)
-//       .attr('cx', d.x = start_x + ((d3.event.x - start_x) / current_scale))
-//       .attr('cy', d.y = start_y + ((d3.event.y - start_y) / current_scale));
-// }
-
-// // drag_handler(circles);
-// circles.call(drag_handler);
 
 //ZOOM
 var zoom_handler = d3.zoom()
@@ -88,7 +61,7 @@ function dragged(d) {
 function dragStarted() {
 //   d3.event.stopPropogation();
   d3.select(this)
-    a.style('fill', 'red');
+    .style('fill', 'red');
 
 }
 
@@ -99,6 +72,33 @@ circles.call(d3.drag()
 
 
 
+//DRAG (hard way)
+// var drag_handler = d3.drag()
+//                         .on('start', drag_start)
+//                         .on('drag', drag_drag);
+
+// function drag_start() {
+//     d3.select(this)
+//         .select('circle')
+//         .attr('r', 20);
+//     start_x = +d3.event.x;
+//     start_y = +d3.event.y;
+// }
+
+// function drag_drag(d) {
+//     if (this.getAttribute('transform') === null) {
+//         current_scale - 1;
+//     } else {
+//         current_scale_string = this.getAttribute('transform').split(' ')[1];
+//         current_scale = +current_scale_string.substring(6, current_scale_string.length-1);
+//     }
+//     d3.select(this)
+//       .attr('cx', d.x = start_x + ((d3.event.x - start_x) / current_scale))
+//       .attr('cy', d.y = start_y + ((d3.event.y - start_y) / current_scale));
+// }
+
+// // drag_handler(circles);
+// circles.call(drag_handler);
 
 // svg.append('circle')
 //      .attr('cx', point.x)
