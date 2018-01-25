@@ -14,45 +14,34 @@
             stroke: #333;
             shape-rendering: crispEdges;
         }
+
     </style>
 </head>
 <body>
     <div id='chart'></div>
-    <!-- <div id='chart2'>
-        <p>1</p>
-        <p>2</p>
-        <p>3</p>
-        <p>4</p>
-        <p>5</p>
-        <p>6</p>
-    </div> -->
-
-    <div id='chart3'>
-        
-    </div>
-
-
 
     <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/4.12.2/d3.min.js'></script>
     <script type='text/javascript'>
         const padding = 50;
-        const height = 800;
+        const height = 600;
         const width = 500;
 
-        const zoom = d3.zoom()
-                        .scaleExtent([1,10])
-                        .on('zoomed', zoomed);
+        // const zoom = d3.zoom()
+        //                 .scaleExtent([1,10])
+        //                 .on('zoomed', zoomed);
 
 
-        var viz = d3.select('#chart')
+        let svg = d3.select('#chart')
                     .append('svg')
                       .attr('height', height + padding * 2)
-                      .attr('width', width + padding * 2)
-                    .append('g')
+                      .attr('width', width + padding * 2);
+                    // .call(zoom);
+
+        let viz = svg.append('g')
                       .attr('id', 'viz')
-                      .attr('transform', 'translate(' + padding + ',' + padding + ')');
+                      .attr('transform', `translate(${padding}, ${padding})`);
         
-        viz.call(d3.zoom().on('zoom', zoomed));
+        // viz.call(d3.zoom().on('zoom', zoomed));
         
         let yScale = d3.scaleLinear().range([height, 0]);
         let xScale = d3.scaleTime().range([0, width]);
@@ -64,6 +53,11 @@
                                  .ticks(20);
 
         let parseTime = d3.timeParse("%Y%m%d");
+
+        // function zoomed() {
+        //     // debugger;
+        //     viz.attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`);
+        // }
         
 
                 
@@ -71,8 +65,6 @@
         d3.csv('climate_data.csv', function(data) {
             console.log(data);
 
-            // const yMax = d3.max(data, (e) => parseInt(e.TMAX));
-            // const yMin = d3.min(data, (e) => parseInt(e.TMAX));
             let yDomain = d3.extent(data, (e) => parseInt(e.TMAX) * 1.1);
             let xDomain = d3.extent(data, (e) => parseTime(e.DATE));
 
@@ -93,48 +85,49 @@
 
             // Add X Axis
            viz.append('g')
-                  .attr('class', 'x axis')
+                  .attr('class', 'axis x-axis')
                   .attr('transform', `translate(0, ${height})`)
-                .call(xAxis)
+                .call(xAxis) // .call(xAxis) is equivalent to xAxis(viz.append('g').attr('class', 'x axis') )
                 .selectAll('text')
                   .attr('transform', () => 'rotate(-65)')
                   .style('text-anchor', 'end')
                   .style('font-size', '10px')
                   .attr('dx', '-10px')
                   .attr('dy', '10px');
-            //equivalent to code below:
-            // xAxis(viz.append('g').attr('class', 'x axis') ) 
+             
 
             // Add Y Axis
             viz.append('g')
-                 .attr('class', 'y axis')
+                 .attr('class', 'axis y-axis')
                  .call(yAxis);
 
+            // Bind data to each g group, add class 'dots'
             let dots = viz.selectAll('g.dots')
                             .data(data)
                             .enter()
                           .append('g')
                             .attr('class', 'dots');
             
+            // transform each dot to the right part of the screen
             dots.attr('transform', (d) => {
                 const date = parseTime(d.DATE);
                 const x = xScale(date);
                 const y = yScale(d.TMAX);
                 return `translate( ${x}, ${y} )`; })
-                .style('stroke', 'yellow')
+                .style('stroke', 'black')
                 .style('fill', 'black');
                 
+            // append a circle to each g group
             dots.append('circle')
                   .attr('r', 5)
-                  .attr('fill', (d) => {
-                    const year = d.DATE.charAt(3);
-                    return year === '3' ? 'blue' : 'red';
-                  });
+                  .attr('fill', 'white')
             dots.append('text')
                   .text( (d) =>  d.TMAX )
                   .attr('transform', 'rotate(-40)')
                   .style('stroke', 'black')
                   .style('display', 'none');
+
+            // show the value on hover
             dots.on('mouseenter', function(d, i) { //event listener function can do anything in app. 
             // the listener has access to the dataum and index of the item.  also have access to D3.event global. can
             // tell us things like x and y position of event, if ctrl was pressed down, or if any data is in clipboard
@@ -148,29 +141,24 @@
                 const dot = d3.select(this);
                 dot.select('text')
                    .style('display', 'none');
-            })
+            });
+
+            //add transitions as graph loads
+            dots.selectAll('circle')
+                .transition()
+                  .duration(4000)
+                  .style('fill', (d) => {
+                    const year = d.DATE.charAt(3);
+                    return year === '3' ? 'blue' : 'red';
+                    }
+                  )
+                  .style('stroke', 'yellow');
+
+            
             
 
         });
 
-        // dots.attr('r', function(d) { return Math.abs(d.TMAX) / 50 })
-        // dots.attr('r', 5)
-        // .attr('cx', (d) => xScale(parseTime(d.DATE)))
-        // .attr('cy', (d) => yScale(d.TMAX))
-        // .style('stroke', 'red')
-        // .style('fill', function(d) {
-        //     year = d.DATE.charAt(3)
-        //     if (year === '3') {
-        //         return "blue"
-        //     } else return 'red'
-        // });
-
-
-        // var viz2 = d3.select('#chart2');
-
-        // viz2.selectAll('p').style('background', (d, i) => {
-        //     return i % 2 ? "#fff" : "#eee";
-        // });
 
         // viz2.selectAll('p')
         //     .data([12,16,18,24,36,48])
